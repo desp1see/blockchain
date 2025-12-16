@@ -12,35 +12,36 @@ function createParticle() {
   const particle = document.createElement("div");
   particle.classList.add("particle");
 
-  const emojis = ["💀", "💖", "💝", "✨", "🖤", "🌸"];
+  const emojis = ["💀", "💖", "💝", "✨", "🖤", "🌸", "⭐", "🌟", "🕷️", "🕸️"];
   particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
 
   particle.style.left = Math.random() * 100 + "vw";
-  particle.style.bottom = "-50px";
-  particle.style.opacity = 0;
 
-  const size = 20 + Math.random() * 30;
+  const size = 25 + Math.random() * 35;
   particle.style.fontSize = size + "px";
 
-  particle.style.animationDuration = 8 + Math.random() * 8 + "s";
-  particle.style.animationDelay = Math.random() * 2 + "s";
+  const duration = 10 + Math.random() * 8;
+  particle.style.animationDuration = duration + "s";
+
+  const direction = Math.random() > 0.5 ? "float" : "floatReverse";
+  particle.style.animationName = direction;
+
+  particle.style.animationDelay = Math.random() * 1.5 + "s";
 
   particlesContainer.appendChild(particle);
 
-  setTimeout(() => particle.remove(), 20000);
+  setTimeout(() => {
+    if (particle.parentElement) particle.remove();
+  }, (duration + 2) * 1000);
 }
 
-// Основной поток частиц
-setInterval(createParticle, 350);
+setInterval(createParticle, 300);
 
-// ВСЁ остальное в одном DOMContentLoaded
 document.addEventListener("DOMContentLoaded", () => {
-  // Стартовый burst: 15 частиц сразу
-  for (let i = 0; i < 15; i++) {
-    setTimeout(createParticle, i * 200);
+  for (let i = 0; i < 25; i++) {
+    setTimeout(createParticle, i * 100);
   }
 
-  // Основная логика dApp
   const connectBtn = document.getElementById("connectBtn");
   const setBtn = document.getElementById("setBtn");
   const refreshBtn = document.getElementById("refreshBtn");
