@@ -1,93 +1,114 @@
-const CONTRACT_ADDRESS = "0xE834D60bb38cB20aCCD7D7B88972929a0994D42e";
+const contractAddress = "0x0B2eA28845226a45436A0591F14488dEfb7a1ef2";
 
-const ABI = [
-  "function owner() view returns (address)",
-  "function getBalance() view returns (uint)",
-  "function sendETH(address payable _to, uint _amount)",
-  "event Received(address indexed from, uint amount)",
-  "event Sent(address indexed to, uint amount)"
+const abi = [
+  "constructor(string _greeting)",
+  "function greeting() public view returns (string)",
+  "function getGreeting() public view returns (string)",
+  "function setGreeting(string _greeting) public"
 ];
 
-let provider, signer, contract, userAddress;
+// Генерация летающих частиц 💀💖
+function createParticle() {
+  const particlesContainer = document.getElementById("particles");
+  const particle = document.createElement("div");
+  particle.classList.add("particle");
+  
+  // Рандомно череп или сердце
+  particle.textContent = Math.random() > 0.5 ? "💀" : "💖";
+  
+  // Рандомная позиция по горизонтали
+  particle.style.left = Math.random() * 100 + "vw";
+  
+  // Рандомная задержка и длительность анимации
+  particle.style.animationDuration = 10 + Math.random() * 10 + "s";
+  particle.style.animationDelay = Math.random() * 5 + "s";
+  
+  particlesContainer.appendChild(particle);
+  
+  // Удаляем через 25 секунд, чтобы не засорять DOM
+  setTimeout(() => {
+    particle.remove();
+  }, 25000);
+}
 
+// Создаём новые частицы каждые 800 мс
+setInterval(createParticle, 800);
+
+// Основная логика dApp
 document.addEventListener("DOMContentLoaded", () => {
   const connectBtn = document.getElementById("connectBtn");
-  const depositBtn = document.getElementById("depositBtn");
-  const withdrawBtn = document.getElementById("withdrawBtn");
-  const balanceEl = document.getElementById("balance");
-  const ownerEl = document.getElementById("owner");
-  const eventsList = document.getElementById("eventsList");
+  const setBtn = document.getElementById("setBtn");
+  const refreshBtn = document.getElementById("refreshBtn");
+  const greetingEl = document.getElementById("greeting");
+  const newGreetingInput = document.getElementById("newGreeting");
+
+  let provider, signer, contract;
 
   connectBtn.onclick = async () => {
-    if (!window.ethereum) return alert("Установите MetaMask!");
+    if (!window.ethereum) {
+      alert("Установите MetaMask!");
+      return;
+    }
+
     try {
       provider = new ethers.BrowserProvider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
       signer = await provider.getSigner();
-      userAddress = await signer.getAddress();
-      contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+      contract = new ethers.Contract(contractAddress, abi, signer);
 
-      connectBtn.innerText = `Подключено: ${userAddress.slice(0,6)}...${userAddress.slice(-4)}`;
-      loadData();
-      setupEventListeners();
-    } catch (err) {
-      alert("Ошибка: " + err.message);
+      const address = await signer.getAddress();
+      connectBtn.textContent = `Подключено: ${address.slice(0, 6)}...${address.slice(-4)}`;
+      connectBtn.disabled = true;
+
+      loadGreeting();
+    } catch (error) {
+      console.error(error);
+      alert("Ошибка: " + error.message);
     }
   };
 
-  async function loadData() {
-    const owner = await contract.owner();
-    const balance = await contract.getBalance();
-    ownerEl.textContent = owner;
-    balanceEl.textContent = ethers.formatEther(balance);
-  }
+  async function loadGreeting() {
+    if (!contract) {
+      greetingEl.textContent = "Подключите кошелёк";
+      return;
+    }
 
-  function logEvent(text) {
-    const li = document.createElement("li");
-    li.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
-    eventsList.prepend(li);
-  }
-
-  function setupEventListeners() {
-    contract.on("Received", (from, amount) => {
-      logEvent(`Получено ${ethers.formatEther(amount)} ETH от ${from}`);
-      loadData();
-    });
-
-    contract.on("Sent", (to, amount) => {
-      logEvent(`Отправлено ${ethers.formatEther(amount)} ETH на ${to}`);
-      loadData();
-    });
-  }
-
-  depositBtn.onclick = async () => {
-    const amount = document.getElementById("depositAmount").value;
-    if (!amount || amount <= 0) return alert("Введите сумму");
     try {
-      const tx = await signer.sendTransaction({
-        to: CONTRACT_ADDRESS,
-        value: ethers.parseEther(amount)
-      });
-      logEvent(`Пополнение на ${amount} ETH...`);
+      const current = await contract.getGreeting();
+      greetingEl.textContent = current || "Hello, World!";
+    } catch (error) {
+      greetingEl.textContent = "Ошибка загрузки";
+      console.error(error);
+    }
+  }
+
+  setBtn.onclick = async () => {
+    if (!contract) return alert("Подключите MetaMask!");
+
+    const newText = newGreetingInput.value.trim();
+    if (!newText) return alert("Введите текст!");
+
+    try {
+      setBtn.textContent = "Отправляем...";
+      setBtn.disabled = true;
+      const tx = await contract.setGreeting(newText);
       await tx.wait();
-      logEvent(`Пополнено ${amount} ETH`);
-    } catch (err) {
-      alert("Ошибка: " + err.message);
+      loadGreeting();
+      newGreetingInput.value = "";
+      alert("Приветствие изменено! 💀💖");
+    } catch (error) {
+      console.error(error);
+      alert("Ошибка: " + error.message);
+    } finally {
+      setBtn.textContent = "Изменить";
+      setBtn.disabled = false;
     }
   };
 
-  withdrawBtn.onclick = async () => {
-    const to = document.getElementById("withdrawTo").value;
-    const amount = document.getElementById("withdrawAmount").value;
-    if (!ethers.isAddress(to)) return alert("Неверный адрес");
-    if (!amount || amount <= 0) return alert("Введите сумму");
-    try {
-      const tx = await contract.sendETH(to, ethers.parseEther(amount));
-      logEvent(`Вывод ${amount} ETH на ${to}...`);
-      await tx.wait();
-      logEvent(`Успешно выведено ${amount} ETH`);
-    } catch (err) {
-      alert("Ошибка (только владелец): " + err.message);
-    }
-  };
+  refreshBtn.onclick = loadGreeting;
+
+  // Автоподключение, если уже авторизованы
+  if (window.ethereum?.selectedAddress) {
+    connectBtn.click();
+  }
 });

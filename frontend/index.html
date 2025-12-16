@@ -1,80 +1,34 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <title>Simple Wallet dApp</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Greeting dApp 💀💖</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Контейнер для летающих частиц -->
+  <div id="particles"></div>
+
   <div class="container">
-    <h1>Simple Wallet</h1>
-
-    <!-- Кнопка копирования адреса -->
-    <p style="margin: 0.5rem 0; font-size: 0.9rem; color: #d81b60;">
-      Контракт: <code style="background: #ffeef8; padding: 2px 6px; border-radius: 4px;">0xE834D60bb38cB20aCCD7D7B88972929a0994D42e</code>
-      <button onclick="navigator.clipboard.writeText('0xE834D60bb38cB20aCCD7D7B88972929a0994D42e').then(()=>alert('Скопировано!'))" 
-              style="margin-left: 8px; font-size: 0.8rem; padding: 4px 8px; background: #ff80ab; color: white; border: none; border-radius: 20px; cursor: pointer;">
-        Копировать
-      </button>
-    </p>
-
-    <p><strong>Баланс:</strong> <span id="balance">0</span> ETH</p>
-    <p><strong>Владелец:</strong> <span id="owner">—</span></p>
+    <h1>Greeting dApp</h1>
+    <p class="subtitle">Чёрно-розовая магия на блокчейне 💀💖</p>
+    
+    <div class="greeting-box">
+      <p>Текущее приветствие:</p>
+      <h2 id="greeting">Загрузка...</h2>
+    </div>
 
     <button id="connectBtn">Подключить MetaMask</button>
 
-    <div class="action">
-      <input id="depositAmount" type="number" step="0.001" placeholder="ETH для пополнения" />
-      <button id="depositBtn">Пополнить</button>
+    <div class="set-greeting">
+      <input id="newGreeting" type="text" placeholder="Новое приветствие...">
+      <button id="setBtn">Изменить</button>
     </div>
 
-    <div class="action">
-      <input id="withdrawTo" type="text" placeholder="Адрес получателя (0x...)" />
-      <input id="withdrawAmount" type="number" step="0.001" placeholder="ETH для вывода" />
-      <button id="withdrawBtn">Вывести (только владелец)</button>
-    </div>
-
-    <h3>Лог событий</h3>
-    <ul id="eventsList"></ul>
+    <button id="refreshBtn" class="small">Обновить</button>
   </div>
 
-  <div class="floating heart">❤️</div>
-  <div class="floating flower">🌸</div>
-  <div class="floating heart">❤️</div>
-  <div class="floating flower">🌸</div>
-  <div class="floating heart">❤️</div>
-  <div class="floating flower">🌸</div>
-  <div class="floating heart">❤️</div>
-  <div class="floating flower">🌸</div>
-  <div class="floating heart">❤️</div>
-  <div class="floating flower">🌸</div>
-  <div class="floating heart">❤️</div>
-  <div class="floating flower">🌸</div>
-  <div class="floating heart">❤️</div>
-  <div class="floating flower">🌸</div>
-  <div class="floating heart">❤️</div>
-  <div class="floating flower">🌸</div>
-  <div class="floating heart">❤️</div>
-  <div class="floating flower">🌸</div>
-  <div class="floating heart">❤️</div>
-  <div class="floating flower">🌸</div>
-  <div class="floating heart">❤️</div>
-  <div class="floating flower">🌸</div>
-  <div class="floating heart">❤️</div>
-  <div class="floating flower">🌸</div>
-  <div class="floating heart">❤️</div>
-  <div class="floating flower">🌸</div>
-  <div class="floating heart">❤️</div>
-  <div class="floating flower">🌸</div>
-  <div class="floating heart">❤️</div>
-  <div class="floating flower">🌸</div>
-  <div class="floating heart">❤️</div>
-  <div class="floating flower">🌸</div>
-
-  <!-- Ethers.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.11.0/ethers.umd.min.js"></script>
-  
-  <!-- Твой скрипт (ПОСЛЕДНИЙ!) -->
   <script src="app.js"></script>
 </body>
 </html>
