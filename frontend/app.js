@@ -7,35 +7,40 @@ const abi = [
   "function setGreeting(string _greeting) public"
 ];
 
-// Генерация летающих частиц 💀💖
 function createParticle() {
   const particlesContainer = document.getElementById("particles");
   const particle = document.createElement("div");
   particle.classList.add("particle");
-  
-  // Рандомно череп или сердце
-  particle.textContent = Math.random() > 0.5 ? "💀" : "💖";
-  
-  // Рандомная позиция по горизонтали
+
+  const emojis = ["💀", "💖", "💝", "✨", "🖤", "🌸"];
+  particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
   particle.style.left = Math.random() * 100 + "vw";
-  
-  // Рандомная задержка и длительность анимации
-  particle.style.animationDuration = 10 + Math.random() * 10 + "s";
-  particle.style.animationDelay = Math.random() * 5 + "s";
-  
+  particle.style.bottom = "-50px";
+  particle.style.opacity = 0;
+
+  const size = 20 + Math.random() * 30;
+  particle.style.fontSize = size + "px";
+
+  particle.style.animationDuration = 8 + Math.random() * 8 + "s";
+  particle.style.animationDelay = Math.random() * 2 + "s";
+
   particlesContainer.appendChild(particle);
-  
-  // Удаляем через 25 секунд, чтобы не засорять DOM
-  setTimeout(() => {
-    particle.remove();
-  }, 25000);
+
+  setTimeout(() => particle.remove(), 20000);
 }
 
-// Создаём новые частицы каждые 800 мс
-setInterval(createParticle, 800);
+// Основной поток частиц
+setInterval(createParticle, 350);
 
-// Основная логика dApp
+// ВСЁ остальное в одном DOMContentLoaded
 document.addEventListener("DOMContentLoaded", () => {
+  // Стартовый burst: 15 частиц сразу
+  for (let i = 0; i < 15; i++) {
+    setTimeout(createParticle, i * 200);
+  }
+
+  // Основная логика dApp
   const connectBtn = document.getElementById("connectBtn");
   const setBtn = document.getElementById("setBtn");
   const refreshBtn = document.getElementById("refreshBtn");
@@ -107,7 +112,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   refreshBtn.onclick = loadGreeting;
 
-  // Автоподключение, если уже авторизованы
   if (window.ethereum?.selectedAddress) {
     connectBtn.click();
   }
